@@ -150,12 +150,13 @@ path {
 }
 
 #playAgainButton{
-    background-color: rgb(0, 0, 0);
+    background-color: rgba(24, 22, 22, 0.767);
     color: rgb(255, 255, 255);
     padding: 10px 20px;
     font-size: 20px;
     border: none;
     cursor: pointer;
+    margin-left: 50%;
     margin-top: 20px;
     margin-bottom: 20px;
 }

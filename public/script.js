@@ -4,6 +4,7 @@ const Player = document.querySelector("#player")
 const infoDisplay = document.querySelector("#info-display");
 const err = document.querySelector("#err");
 const width = 8;
+const socket = io();
 
 let playerTurn = "whitePiece";
 Player.textContent = "white"
@@ -51,6 +52,7 @@ function createBoard() {
 
 
 createBoard();
+
 
 
 const allCell = document.querySelectorAll("#board .cell");
@@ -352,42 +354,19 @@ function revertIds() {
     })
 }
 
-function checkForWin() {
-    const kings = Array.from(document.querySelectorAll("#king"));
-    console.log(kings);
-
-    if (!kings.some(king => king.firstChild.classList.contains("whitePiece"))) {
-        infoDisplay.innerHTML = "Black Player Wins!";
-        hideBoard();
-        const allcells = document.querySelectorAll(".cell");
-        allcells.forEach(cell => cell.firstChild?.setAttribute("draggable", false));
-    }
-    if (!kings.some(king => king.firstChild.classList.contains("blackPiece"))) {
-        infoDisplay.innerHTML = "White Player Wins!";
-        hideBoard();
-        const allcells = document.querySelectorAll(".cell");
-        allcells.forEach(cell => cell.firstChild?.setAttribute("draggable", false));
-    }
-}
-
-function hideBoard() {
-    document.getElementById("board").classList.add("hidden");
-    document.querySelector(".turnbar").classList.add("hidden");
-      // Show the "Play Again" button.
-      document.getElementById("playAgainButton").classList.remove("hidden");
-}
-
-// Function to restart the game.
 function restartGame() {
-    // Reset the board and pieces here
+    // Clear the board and reset the game state
     gameBoard.innerHTML = "";
+    infoDisplay.innerHTML = "";  // Clear the winner message
+    
+    // Reset the player turn
+    playerTurn = "whitePiece";
+    Player.textContent = "white";
+    
+    // Recreate the board and reattach event listeners
     createBoard();
-
-    // Reattach event listeners to pieces after recreating the board
     const pieces = document.querySelectorAll(".piece");
-    pieces.forEach(piece => {
-        piece.addEventListener("dragstart", dragstart);
-    });
+    pieces.forEach(piece => piece.addEventListener("dragstart", dragstart));
 
     const cells = document.querySelectorAll(".cell");
     cells.forEach(cell => {
@@ -395,13 +374,32 @@ function restartGame() {
         cell.addEventListener("drop", dragdrop);
     });
 
-    playerTurn = "whitePiece";  // Reset to the starting player
-    Player.textContent = "white"; // Update turn display
-    // For example, you can reload the board state, or clear the moves
+    // Show the board and hide the "Play Again" button
     document.getElementById("board").classList.remove("hidden");
     document.querySelector(".turnbar").classList.remove("hidden");
-    
-    // Hide the "Play Again" button again
     document.getElementById("playAgainButton").classList.add("hidden");
-    document.getElementById("info-display").classList.add("hidden");
+}
+
+function checkForWin() {
+    const kings = Array.from(document.querySelectorAll("#king"));
+
+    if (!kings.some(king => king.firstChild.classList.contains("whitePiece"))) {
+        infoDisplay.innerHTML = "Black Player Wins!";
+        endGame();
+    }
+    if (!kings.some(king => king.firstChild.classList.contains("blackPiece"))) {
+        infoDisplay.innerHTML = "White Player Wins!";
+        endGame();
+    }
+}
+
+function endGame() {
+    const allCells = document.querySelectorAll(".cell");
+    allCells.forEach(cell => cell.firstChild?.setAttribute("draggable", false));
+
+    document.getElementById("board").classList.add("hidden");
+    document.querySelector(".turnbar").classList.add("hidden");
+
+    // Show the "Play Again" button
+    document.getElementById("playAgainButton").classList.remove("hidden");
 }

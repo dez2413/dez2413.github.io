@@ -10,6 +10,35 @@
     <header>
         <h1> Chess</h1>
     </header>
+        <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+        <script>
+            const socket = io();
+            let playerColor = null;
+          
+            socket.on('playerColor', (color) => {
+                playerColor = color;
+                console.log(`You are ${color}`);
+            });
+          
+            socket.on('spectator', () => {
+                console.log('You are a spectator');
+            });
+          
+            socket.on('playerUpdate', (players) => {
+                console.log('Players:', players);
+            });
+          
+            function movePiece(start, end) {
+                if (playerColor) {
+                    socket.emit('movePiece', { start, end, color: playerColor });
+                }
+            }
+          
+            socket.on('pieceMoved', (moveData) => {
+                console.log('Move received:', moveData);
+                // Handle updating the UI with the new move.
+            });
+          </script>
         <div id = "board"></div>
         <div class="bars">
             <p class="turnbar">It Is <span id="player"></span>'s Turn.</p>
